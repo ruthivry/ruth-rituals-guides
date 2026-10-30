@@ -92,6 +92,9 @@ body.has-photo::before { display: block; }
 /* one light wash over every photo so they all feel like the same shoot (overlay only; the photos themselves are untouched) */
 .card .shot:has(img) { background: #fbfcf6 !important; }
 .shot img.off { opacity: 0 !important; }
+/* Tall bio photo (matcha spoon over glass): show it whole, blurred copy fills the sides. No crop, no retouch. */
+.shot img.tall { object-fit: contain; opacity: 1; }
+.shot:has(img.tall:not(.off))::before { content: ""; position: absolute; inset: 0; background: var(--tallbg) center / cover no-repeat; filter: blur(18px); transform: scale(1.15); opacity: .6; }
 .shot:has(img + img) { cursor: pointer; }
 .shot:has(img)::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(135deg, rgba(255,255,255,.45) 0%, rgba(255,255,255,0) 38%, rgba(255,255,255,0) 70%, rgba(255,255,255,.18) 100%); }
 .shot .note { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: rgba(77,90,58,.5); }
@@ -371,6 +374,7 @@ function render() {
   if (photos.length) {
     photos.forEach((src, i) => { const img = document.createElement('img'); img.src = src; img.alt = ''; if (i) img.classList.add('off'); $('shot').appendChild(img); });
     if (photos.length > 1) galleryTimer = setInterval(nextPhoto, 3800);
+    if (!GUIDES[current] && photos[3]) { $('shot').querySelectorAll('img')[3].classList.add('tall'); $('shot').style.setProperty('--tallbg', 'url("' + photos[3] + '")'); }
   }
   else { $('shot').insertAdjacentHTML('afterbegin', artKind === 'bowl' ? ritualArt(g) : artKind === 'swatch' ? swatchArt(g) : artKind === 'cheek' ? cheekArt(g) : swipeArt(g)); }
   $('shot').querySelector('.note').hidden = true;
