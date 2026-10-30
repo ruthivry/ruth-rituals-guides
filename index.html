@@ -1,3 +1,9 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f3f6ea">
 <title>Ruth Rituals Free Guide</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -345,7 +351,9 @@ function render() {
   $('heName').classList.toggle('en', wait); Object.assign($('heName').style, wait ? { letterSpacing: '.06em', fontSize: '13.5px', whiteSpace: 'nowrap', textAlign: 'right' } : { letterSpacing: '', fontSize: '', whiteSpace: '', textAlign: '' });
   $('cta').textContent = wait ? 'אני רוצה להיות ראשונה' : 'שלחי לי את המדריך';
   document.documentElement.style.setProperty('--g2', g.tint);
-  $('title').textContent = g.en; $('heName').textContent = g.he; $('heName').hidden = !g.he;
+  // Guide links show one general 'Free Guide' page; which guide she gets is decided by the link and sent by email.
+  const isGuide = !!GUIDES[current];
+  $('title').textContent = isGuide ? 'Free Guide' : g.en; $('heName').textContent = isGuide ? '' : g.he; $('heName').hidden = isGuide || !g.he;
   const bg = g.bg || BG;
   $('backdrop').hidden = !bg; document.body.classList.toggle('has-photo', !!bg);
   $('backdrop').style.backgroundImage = `url("${bg}")`;
@@ -528,3 +536,5 @@ if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => {
   document.body.classList.toggle('show-veil', e.isIntersecting && matchMedia('(max-width: 859px)').matches);
 }, { threshold: 0.25 }).observe($('shot'));
 </script>
+
+</html>
