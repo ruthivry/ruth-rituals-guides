@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playpen+Sans+Hebrew:wght@200;300;400;500&family=Gloock&family=Allura&family=Jost:wght@300;400;500&display=swap">
 <style>
-/* Layout: one light, hazy screen. Photo, the guide name, two fields, consent, button. Nothing else. */
+/* Layout: one light, hazy screen. Photo, the guide name, three fields, consent, button. Nothing else. */
 :root {
   --paper: #fdfffa;
   --petal: #c5d4aa;      /* button, pistachio */
@@ -189,6 +189,9 @@ form { display: flex; flex-direction: column; gap: 10px; }
         <label class="sr" for="pick">מילת הקוד מהרילס / סטורי</label>
         <input class="input" id="pick" hidden autocomplete="off" placeholder="יש לך מילת קוד מרילס / סטורי? (לא חובה)" aria-describedby="pickMsg">
         <div class="msg" id="pickMsg" aria-live="polite"></div>
+        <label class="sr" for="name">שם</label>
+        <input class="input" id="name" name="name" type="text" autocomplete="given-name" maxlength="60" placeholder="השם שלך" aria-describedby="nameMsg">
+        <div class="msg" id="nameMsg" aria-live="polite"></div>
         <label class="sr" for="phone">טלפון</label>
         <input class="input" id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="הטלפון שלך" aria-describedby="phoneMsg">
         <div class="msg" id="phoneMsg" aria-live="polite"></div>
@@ -440,7 +443,7 @@ function showError(field, res) {
 }
 function clear(field) { $(field).removeAttribute('aria-invalid'); $(field + 'Msg').textContent = ''; }
 
-['email', 'phone'].forEach(f => $(f).addEventListener('input', () => clear(f)));
+['name', 'email', 'phone'].forEach(f => $(f).addEventListener('input', () => clear(f)));
 $('email').addEventListener('blur', () => { if ($('email').value.trim()) { const r = checkEmail($('email').value); if (!r.ok) showError('email', r); } });
 $('phone').addEventListener('blur', () => { if ($('phone').value.trim()) { const r = checkPhone($('phone').value); if (!r.ok) showError('phone', r); } });
 $('consent').addEventListener('change', () => { $('consentMsg').textContent = ''; });
@@ -464,7 +467,9 @@ $('form').addEventListener('submit', async e => {
   $('formMsg').textContent = '';
   const ph = checkPhone($('phone').value);
   const em = checkEmail($('email').value);
+  const nm = $('name').value.trim();
   let bad = false;
+  if (nm.length < 2) { showError('name', { error: 'איך קוראים לך?' }); bad = true; }
   if (!ph.ok) { showError('phone', ph); bad = true; }
   if (!em.ok) { showError('email', em); bad = true; }
   if (!GUIDES[current] && $('pick').value.trim()) { $('pickMsg').textContent = 'לא מצאנו את המילה. בדקי אותה, או מחקי ותירשמי לרשימה.'; bad = true; }
@@ -475,7 +480,7 @@ $('form').addEventListener('submit', async e => {
     if (!(await domainExists(em.email.split('@')[1]))) { showError('email', { error: 'הכתובת הזאת לא קיימת. בדקי אותה.' }); return; }
     let status = GUIDES[current] ? 'sent' : 'waitlist';
     if (ENDPOINT) {
-      const body = new URLSearchParams({ guide: GUIDES[current] ? GUIDES[current].name : 'waitlist', email: em.email, phone: ph.phone, consent: 'yes', website: $('website').value, source: FROM_REEL ? 'reel' : 'bio' });
+      const body = new URLSearchParams({ guide: GUIDES[current] ? GUIDES[current].name : 'waitlist', name: nm, email: em.email, phone: ph.phone, consent: 'yes', website: $('website').value, source: FROM_REEL ? 'reel' : 'bio' });
       const j = await (await fetch(ENDPOINT, { method: 'POST', body })).json();
       if (!j.ok) {
         if (j.error === 'email') showError('email', { error: SERVER_MSG.email });
