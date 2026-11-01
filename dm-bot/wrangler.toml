@@ -1,0 +1,7 @@
+name = "ruth-dm-bot"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+
+[vars]
+IG_USER_ID = ""   # filled after Meta app setup
+DRY_RUN = "1"     # stays 1 until Ruth approves going live

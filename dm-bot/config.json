@@ -1,0 +1,23 @@
+{
+  "formBase": "https://ruthivry.github.io/ruth-rituals-guides/?g=",
+  "profileUrl": "https://www.instagram.com/ruth_ivry/",
+  "keywords": {
+    "מסכה": "mask", "מסיכה": "mask", "מייקאפ": "mask", "מייק אפ": "mask",
+    "רטינול": "retinol",
+    "מאצה": "matcha", "מאצ׳ה": "matcha", "מאצ'ה": "matcha",
+    "קיק": "castor",
+    "קרח": "ice",
+    "ספא": "spa",
+    "בננה": "banana"
+  },
+  "texts": {
+    "opening": "המדריך מחכה לך 🤍",
+    "openingButton": "כן, שלחי לי",
+    "follow": "המדריכים נשלחים אוטומטית רק למי שעוקב📌\nכי זה לא רק מסכה אחת\nזה רוטינת טיפוח שלמה שאני דואגת לעדכן אז לא כדאי לפספס את המתכון הבא",
+    "followButton": "עקבי כדי לקבל",
+    "followCheckButton": "אני עוקבת, שלחי לי",
+    "link": "יקירתי, הכניסי פרטים בקישור והמדריך יגיע אלייך למייל, לשמור ולחזור אליו מתי שתרצי 🤍\nכל יום יש מתכונים חדשים בסטורי.",
+    "linkButton": "לקבלת המדריך",
+    "publicReply": ""
+  }
+}
