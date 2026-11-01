@@ -418,9 +418,11 @@ function checkEmail(raw) {
 function checkPhone(raw) {
   let d = raw.replace(/[^\d+]/g, '');
   if (!d) return { error: 'צריך לכתוב מספר טלפון.' };
-  d = d.replace(/^\+?972/, '0');
-  if (!/^05\d{8}$/.test(d)) return { error: 'המספר לא תקין. כתבי נייד ישראלי, למשל 050-1234567' };
-  return { ok: true, phone: d };
+  d = d.replace(/^00/, '+').replace(/^\+?972/, '0');
+  if (/^05\d{8}$/.test(d)) return { ok: true, phone: d };
+  // Followers abroad: any international number with its country code.
+  if (/^\+[1-9]\d{7,14}$/.test(d)) return { ok: true, phone: d };
+  return { error: 'המספר לא תקין. נייד ישראלי (050-1234567) או מספר מחו״ל עם קידומת המדינה (+1 646 555 1234)' };
 }
 
 // Checks the email domain really receives mail (has MX records), using free public DNS.
