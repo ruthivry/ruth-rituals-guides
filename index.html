@@ -121,6 +121,8 @@ form { display: flex; flex-direction: column; gap: 10px; }
 .input:focus { border-color: var(--cocoa); background: #fff; }
 .input[aria-invalid="true"] { border-color: var(--error); }
 #pick { direction: rtl; text-align: right; font-family: var(--f-he); }
+.back { font-size: 15px; margin: 0 0 6px; }
+.back button { font: inherit; font-size: 13px; color: var(--cocoa); background: none; border: 0; padding: 0; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; margin-inline-start: 6px; }
 .msg { min-height: 1.1em; font-size: 13.5px; color: var(--error); }
 .msg:empty { min-height: 0; }
 .msg button { font: inherit; color: var(--cocoa); background: none; border: 0; padding: 0; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; direction: ltr; unicode-bidi: isolate; }
@@ -192,6 +194,8 @@ form { display: flex; flex-direction: column; gap: 10px; }
         <label class="sr" for="pick">מילת הקוד מהרילס / סטורי</label>
         <input class="input" id="pick" hidden autocomplete="off" placeholder="יש לך מילת קוד מרילס / סטורי? (לא חובה)" aria-describedby="pickMsg">
         <div class="msg" id="pickMsg" aria-live="polite"></div>
+        <p class="back" id="back" hidden><span id="backHi"></span><button type="button" id="backEdit">לא את? לשנות פרטים</button></p>
+        <div id="fields">
         <label class="sr" for="name">שם</label>
         <input class="input" id="name" name="name" type="text" autocomplete="given-name" maxlength="60" placeholder="השם שלך" aria-describedby="nameMsg">
         <div class="msg" id="nameMsg" aria-live="polite"></div>
@@ -201,6 +205,7 @@ form { display: flex; flex-direction: column; gap: 10px; }
         <label class="sr" for="email">מייל</label>
         <input class="input" id="email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="המייל שלך" aria-describedby="emailMsg">
         <div class="msg" id="emailMsg" aria-live="polite"></div>
+        </div>
         <label class="consent" for="consent">
           <input id="consent" name="consent" type="checkbox" value="yes">
           <span><b class="nudge">כדי לא לפספס אף מדריך שיוצא,</b>אני מאשרת לקבל עדכונים, מדריכים חדשים ותוכן שיווקי במייל ובהודעה מ-<bdi>RUTH RITUALS</bdi>. אפשר להסיר בכל רגע.</span>
@@ -469,6 +474,17 @@ const DONE_MSG = {
   waitlist: 'את ברשימה! את תהיי הראשונה לשמוע כשהרוטינה יוצאת.',
 };
 
+// Returning visitor: details remembered on her own phone after a successful signup. Consent box stays unchecked (law).
+(function () {
+  let d = null;
+  try { d = JSON.parse(localStorage.getItem('rr_lead') || 'null'); } catch (_) {}
+  if (!d || !d.email) return;
+  $('name').value = d.name || ''; $('phone').value = d.phone || ''; $('email').value = d.email;
+  $('backHi').textContent = 'היי ' + (d.name || '') + ', את כבר רשומה אצלי 🤍 רק לסמן וי וללחוץ.';
+  $('back').hidden = false; $('fields').hidden = true;
+  $('backEdit').onclick = () => { $('fields').hidden = false; $('back').hidden = true; $('name').focus(); };
+})();
+
 $('form').addEventListener('submit', async e => {
   e.preventDefault();
   $('formMsg').textContent = '';
@@ -481,7 +497,7 @@ $('form').addEventListener('submit', async e => {
   if (!em.ok) { showError('email', em); bad = true; }
   if (!GUIDES[current] && $('pick').value.trim()) { $('pickMsg').textContent = 'לא מצאנו את המילה. בדקי אותה, או מחקי ותירשמי לרשימה.'; bad = true; }
   if (!$('consent').checked) { $('consentMsg').textContent = SERVER_MSG.consent; bad = true; }
-  if (bad) return;
+  if (bad) { if (!$('fields').hidden || ['name','phone','email'].some(f => $(f).getAttribute('aria-invalid'))) { $('fields').hidden = false; $('back').hidden = true; } return; }
   $('cta').disabled = true;
   try {
     if (!(await domainExists(em.email.split('@')[1]))) { showError('email', { error: 'הכתובת הזאת לא קיימת. בדקי אותה.' }); return; }
@@ -498,6 +514,7 @@ $('form').addEventListener('submit', async e => {
         return;
       }
       status = j.status;
+      try { localStorage.setItem('rr_lead', JSON.stringify({ name: nm, phone: $('phone').value.trim(), email: em.email })); } catch (_) {}
     }
     $('form').hidden = true;
     $('doneBig').textContent = status === 'waitlist' ? "you're on the list." : 'on its way.';
