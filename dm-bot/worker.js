@@ -74,9 +74,9 @@ async function onComment(c, env) {
   if (c.from?.id === env.IG_USER_ID) return; // my own comments
   const key = matchKeyword(c.text);
   if (!key) return;
-  if (CONFIG.texts.publicReply) {
-    await ig(`/${c.id}/replies`, { message: CONFIG.texts.publicReply }, env);
-  }
+  // LAW (Ruth 2.11): EVERY keyword comment gets a public reply, follower or not,
+  // rotating through at least 3 approved texts.
+  await ig(`/${c.id}/replies`, { message: pickPublicReply(key, c.id) }, env);
   // Meta allows ONE private reply per comment, and we can't check follow yet,
   // so we send the short opening with a button. The tap lets us check follow.
   await ig("/me/messages", {
@@ -85,6 +85,13 @@ async function onComment(c, env) {
       { type: "postback", title: CONFIG.texts.openingButton, payload: `SEND:${key}` },
     ]),
   }, env);
+}
+
+export function pickPublicReply(key, commentId) {
+  const list = CONFIG.publicReplies[key] || CONFIG.publicReplies.default;
+  let h = 0;
+  for (const ch of String(commentId)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return list[h % list.length];
 }
 
 async function sendLinkOrFollow(userId, key, env) {
