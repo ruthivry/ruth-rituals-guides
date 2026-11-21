@@ -477,7 +477,7 @@ const SERVER_MSG = {
 const DONE_MSG = {
   sent: 'המדריך נשלח עכשיו למייל שלך.',
   queued: 'קיבלתי. המדריך יישלח אלייך למייל בשעות הקרובות.',
-  already_sent: 'המדריך כבר נשלח לכתובת הזאת. אם הוא לא אצלך, בדקי בספאם.',
+  already_sent: 'המדריך כבר נשלח לכתובת הזאת ממש לאחרונה.',
   waitlist: 'את ברשימה! את תהיי הראשונה לשמוע כשהרוטינה יוצאת.',
 };
 
@@ -525,7 +525,7 @@ $('form').addEventListener('submit', async e => {
     }
     $('form').hidden = true;
     $('doneBig').textContent = status === 'waitlist' ? "you're on the list." : 'on its way.';
-    $('doneText').textContent = (DONE_MSG[status] || DONE_MSG.sent) + (ENDPOINT ? '' : ' (טיוטה: שום דבר לא נשלח באמת)');
+    $('doneText').textContent = (DONE_MSG[status] || DONE_MSG.sent) + (status === 'waitlist' ? '' : ' נשלח אל: ' + em.email + '. לא הגיע? בדקי בספאם ובקידומי מכירות, ושהמייל נכון.') + (ENDPOINT ? '' : ' (טיוטה: שום דבר לא נשלח באמת)');
     $('done').hidden = false;
   } catch (err) {
     $('formMsg').textContent = 'אין חיבור כרגע. נסי שוב בעוד רגע.';
